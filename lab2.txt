@@ -1,0 +1,109 @@
+8-Create a Virtual Host
+ sudo nano /etc/apache2/sites-available/os.iti.gov.eg.conf
+ --Write on it
+ [
+    <VirtualHost *:80>
+    ServerName os.iti.gov.eg
+    DocumentRoot /var/www/os.iti.gov.eg
+
+    <Directory /var/www/os.iti.gov.eg>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/os_iti_error.log
+    CustomLog ${APACHE_LOG_DIR}/os_iti_access.log combined
+</VirtualHost>
+
+ ]
+  sudo mkdir -p /var/www/os.iti.gov.eg
+  sudo a2ensite os.iti.gov.eg.conf
+  sudo systemctl reload apache2
+
+9-Enable rewrite module
+    apachectl -M | grep rewrite
+    sudo a2enmod rewrite
+    sudo systemctl restart apache2
+
+10-What is the importance of rewrite module
+  mod_rewrite is a powerful module in Apache that allows you to rewrite or modify URLs
+
+Its importance includes:
+
+Improving the appearance of URLs to make them more user-friendly
+
+Turning long or complicated URLs into simple ones
+
+Redirecting URLs (e.g moving visitors from an old page to a new one)
+
+Protecting websites by controlling HTTP requests
+
+Handling advanced conditions using Regular Expressions
+
+==============================================================================
+
+ 
+1-Configure Apache to use Worker MPM
+ sudo a2dismod mpm_event
+ sudo a2dismod mpm_prefork
+ sudo a2enmod mpm_worker
+ sudo systemctl restart apache2
+
+2-Check the status of rewrite_mod and enable it if it is disabled
+  apachectl -M | grep rewrite
+  sudo a2enmod rewrite
+  sudo systemctl restart apache2
+
+3-Write RewriteCond and RewriteRules
+ --Deny access
+ RewriteEngine On
+RewriteCond %{QUERY_STRING} forbidden
+RewriteRule ^/page$ - [F,L]
+
+--Remove the QUERY_STRING
+RewriteCond %{QUERY_STRING} .
+RewriteRule ^/page$ /page? [R=301,L]
+
+--Rewrite 
+RewriteCond %{QUERY_STRING} (^|&)var=([^&]+)(&|$)
+RewriteRule ^/page1$ /page2?%{QUERY_STRING} [R=302,L]
+
+--Transform
+RewriteCond %{QUERY_STRING} ^var=([^&]+)$
+RewriteRule ^/path$ /path/var/%1? [R=302,L]
+
+--map
+RewriteRule ^/example/([^/]+)/([^/]+)$ /something.cgi?arg=$1&other=$2 [QSA,L]
+
+
+4-Bouns
+1-Display evening or morning page depending on time
+RewriteEngine On
+RewriteCond %{TIME_HOUR} >=18
+RewriteRule ^$ /goodevening.html [L]
+RewriteCond %{TIME_HOUR} <18
+RewriteRule ^$ /goodmorning.html [L]
+
+2-Create a Virtual Host
+ sudo nano /etc/apache2/sites-available/os.iti.gov.eg.conf
+ --Write on it 
+ [
+    <VirtualHost *:80>
+    ServerName os.iti.gov.eg
+    DocumentRoot /var/www/os.iti.gov.eg
+
+    <Directory /var/www/os.iti.gov.eg>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/os_iti_error.log
+    CustomLog ${APACHE_LOG_DIR}/os_iti_access.log combined
+</VirtualHost>
+
+ ]
+
+وبعدين هافعله
+ sudo mkdir -p /var/www/os.iti.gov.eg
+ sudo a2ensite os.iti.gov.eg.conf
+ sudo systemctl reload apache2
