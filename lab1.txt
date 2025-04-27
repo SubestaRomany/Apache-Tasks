@@ -1,0 +1,80 @@
+1-Create two simple html pages named "pagel.html, page2.html" then use the suitable directive to automatically redirect from localhost/pagel.html to localhost/page2.html.
+
+cd /var/www/html
+sudo nano page1.html  => write on it   <h1>This is Page 1</h1>
+sudo nano page2.html  => write on it   <h1>This is Page 2</h1>
+sudo nano .htaccess   => write on it   Redirect /page1.html /page2.html
+sudo nano /etc/apache2/apache2.conf  =>  and search for it <Directory /var/www/>
+AllowOverride All
+sudo systemctl reload apache2
+
+
+2-Ask for user name and password when accessing a directory
+
+sudo mkdir /var/www/html/folder_sec
+sudo nano /var/www/html/folder_sec/.htaccess => write on it
+[
+AuthType Basic
+AuthName "Private Area"
+AuthUserFile /etc/apache2/.htpasswd
+Require valid-user
+]
+sudo htpasswd -c /etc/apache2/.htpasswd saraaa
+sudo systemctl reload apache2
+
+
+3-Apply authentication before downloading PDF files.
+
+sudo mkdir /var/www/html/pdfff_files
+sudo cp /home/subesta/Downloads/oop.pdf /var/www/html/pdfff_files/
+sudo htpasswd -c /etc/apache2/.htpasswd subesta
+sudo nano /var/www/html/pdfff_files/.htaccess  => write on it
+[
+    <Files "*.pdf">
+    AuthType Basic
+    AuthName "Restricted PDF Access"
+    AuthUserFile /etc/apache2/.htpasswd
+    Require valid-user
+</Files>
+
+]
+sudo systemctl reload apache2
+
+
+
+4.Create a directory then allow access to one of your classmates only.
+
+sudo mkdir /var/www/html/folder_restricted
+sudo htpasswd -c /etc/apache2/.htpasswd classmate
+sudo nano /var/www/html/folder_restricted/.htaccess  => write on it 
+[
+    AuthType Basic
+AuthName "Restricted Area"
+AuthUserFile /etc/apache2/.htpasswd
+Require user classmate
+
+]
+
+sudo systemctl reload apache2
+
+
+5. Disable listing the directory content (hint use indexs)
+
+sudo mkdir /var/www/html/res_folder
+sudo nano /var/www/html/res_folder/.htaccess  => write on it  Options -Indexes
+sudo systemctl reload apache2
+
+
+
+6. Change the default index page to be defauit html instead of index.html (use Directoryindex)
+
+sudo nano /var/www/html/default.html
+sudo nano /etc/apache2/mods-enabled/dir.conf  => modify it   DirectoryIndex default.html index.html index.cgi index.pl index.php index.xhtml index.htm
+sudo systemctl reload apache2
+
+
+
+
+
+
+
